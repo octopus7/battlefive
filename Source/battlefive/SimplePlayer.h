@@ -64,6 +64,11 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	int32 AttackComboIndexMax = 4;
 
 	// 카메라 록 상태
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	bool LockCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	AActor* TargetEnemy;
 
 public:
 	ASimplePlayer();
@@ -85,6 +90,9 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// 카메라 락 대상 찾기
+	void GetClosestEnemy();
 
 public:	
 	// Called every frame

@@ -82,6 +82,7 @@ void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASimplePlayer::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASimplePlayer::Look);
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ASimplePlayer::Roll);
+		EnhancedInputComponent->BindAction(LockAction, ETriggerEvent::Started, this, &ASimplePlayer::Lock);
 	}
 	else
 	{
@@ -124,8 +125,64 @@ void ASimplePlayer::Jump(const FInputActionValue& Value)
 void ASimplePlayer::Lock(const FInputActionValue& Value)
 {
 	// 카메라 고정 기능 (토글)
+	LockCamera = !LockCamera;
+	if (LockCamera)
+	{
+		GetClosestEnemy();
+		UE_LOG(LogTemplateCharacter, Display, TEXT("Lock '%s'"), *GetNameSafe(this));
+		if(TargetEnemy != nullptr) UE_LOG(LogTemplateCharacter, Display, TEXT("Target '%s'"), *GetNameSafe(TargetEnemy));
+	}
+	else
+	{
+		TargetEnemy = nullptr;
+		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock '%s'"), *GetNameSafe(this));
+	}
+}
 
-	UE_LOG(LogTemplateCharacter, Display, TEXT("Lock '%s'"), *GetNameSafe(this));
+void ASimplePlayer::GetClosestEnemy()
+{
+	FVector Center = GetActorLocation();
+	float fRadius = 3000.0f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
+	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // 폰만 
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this); // 자신 제외
+
+	float fMinDistance = 9999.0f;
+	TargetEnemy = nullptr;
+
+	TArray<AActor*> overlappedActors;
+	if (UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Center, fRadius, ObjectTypesArray, nullptr, IgnoredActors, overlappedActors))
+	{
+		for(AActor *pActor : overlappedActors)
+		{
+			FHitResult hitResult;
+			FCollisionQueryParams QueryParam;
+			QueryParam.AddIgnoredActor(this);
+			FCollisionResponseParams CollRes;
+
+			//if (GetWorld()->LineTraceSingleByChannel(hitResult, Center, pActor->GetActorLocation(),
+			//	UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
+			//	false, IgnoredActors, EDrawDebugTrace::ForDuration, true))
+
+			if (GetWorld()->LineTraceSingleByChannel(hitResult, Center, pActor->GetActorLocation(),
+				ECollisionChannel::ECC_Visibility, QueryParam, CollRes) )
+			{
+				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach d2 '%s'"), *GetNameSafe(pActor));
+
+				auto pHitActor = hitResult.GetActor();
+				if (pHitActor == pActor)
+				{
+					float fDistance = GetDistanceTo(pHitActor);
+					if (fMinDistance > fDistance)
+					{
+						fMinDistance = fDistance;
+						TargetEnemy = pActor;
+					}
+				}
+			}
+		}
+	}
 }
 
 void ASimplePlayer::Attack(const FInputActionValue& Value)
@@ -179,6 +236,5 @@ void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
 	PlayAnimMontage(MontageRoll); // 몽타주 플레이 
 }
-
 
 
