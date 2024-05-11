@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -20,7 +20,7 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 {
 	GENERATED_BODY()
 
-	// Ä«¸Ş¶ó
+	// ì¹´ë©”ë¼
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -30,7 +30,7 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	// ±âº»¾×¼Ç
+	// ê¸°ë³¸ì•¡ì…˜
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -38,12 +38,12 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 
-	// Ä«¸Ş¶ó Àá±İ
+	// ì¹´ë©”ë¼ ì ê¸ˆ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LockAction;
 	
 
-	// ÀüÅõ (±ÙÁ¢°ø°İ, ±¸¸£±â, ¹ß»ç)
+	// ì „íˆ¬ (ê·¼ì ‘ê³µê²©, êµ¬ë¥´ê¸°, ë°œì‚¬)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AttackAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -51,22 +51,24 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RollAction;
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ¸®¼Ò½º
+	// ì• ë‹ˆë©”ì´ì…˜ ë¦¬ì†ŒìŠ¤
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* MontageRoll;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	TArray<UAnimMontage*> MontageAttacks;
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ
+	// ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	int32 AttackComboIndex = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	int32 AttackComboIndexMax = 4;
 
+	// ì¹´ë©”ë¼ ë¡ ìƒíƒœ
+
 public:
 	ASimplePlayer();
 
-	// reset attack montage index
+	// reset attack montage index ê³µê²© ë¡œí…Œì´ì…˜ ëª½íƒ€ì£¼ ì¸ë±ìŠ¤ ë¦¬ì…‹ 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AttackSystem")
 	void ResetAttack();
 

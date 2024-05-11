@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "SimplePlayer.h"
@@ -17,19 +17,19 @@
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-// »ı¼ºÀÚ
+// ìƒì„±ì
 ASimplePlayer::ASimplePlayer()
 {	
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f); // ÄÃ¶óÀÌ´õ¿ë ÄÄÆ÷³ÍÆ® »ı¼º
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f); // ì»¬ë¼ì´ë”ìš© ì»´í¬ë„ŒíŠ¸ ìƒì„±
 
-	// Ä³¸¯ÅÍ ÄÁÆ®·Ñ·¯ ¼³Á¤
+	// ìºë¦­í„° ì»¨íŠ¸ë¡¤ëŸ¬ ì„¤ì •
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true; // ÀÎÇ² ¹æÇâÀ¸·Î ÀÌµ¿
+	GetCharacterMovement()->bOrientRotationToMovement = true; // ì¸í’‹ ë°©í–¥ìœ¼ë¡œ ì´ë™
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); 
 
-	// ¹«ºê¸ÕÆ® ÄÄÆ÷³ÍÆ®´Â ÀÚÁÖ º¯°æÇÏ¸é¼­ ¼¼ÆÃ´Â Æ¯¼º»ó ºí·ç ÇÁ¸°Æ® Á¦¾î ´õ È¿À²ÀûÀÌ¹Ç·Î ÄÚµå ¼öÁ¤º¸´Ù´Â ¿¡µğÅÍ¿¡¼­ Á¶Á¤
+	// ë¬´ë¸Œë¨¼íŠ¸ ì»´í¬ë„ŒíŠ¸ëŠ” ìì£¼ ë³€ê²½í•˜ë©´ì„œ ì„¸íŒ…ëŠ” íŠ¹ì„±ìƒ ë¸”ë£¨ í”„ë¦°íŠ¸ ì œì–´ ë” íš¨ìœ¨ì ì´ë¯€ë¡œ ì½”ë“œ ìˆ˜ì •ë³´ë‹¤ëŠ” ì—ë””í„°ì—ì„œ ì¡°ì •
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -37,16 +37,16 @@ ASimplePlayer::ASimplePlayer()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
-	// ÇÃ·¹ÀÌ¾î Ä«¸Ş¶ó ¼³Á¤
+	// í”Œë ˆì´ì–´ ì¹´ë©”ë¼ ì„¤ì •
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // Ä«¸Ş¶ó ¾Ï °Å¸®
-	CameraBoom->bUsePawnControlRotation = true; // ÄÁÆ®·Ñ·¯ ±â¹İÀ¸·Î ¾ÏÈ¸Àü
+	CameraBoom->TargetArmLength = 400.0f; // ì¹´ë©”ë¼ ì•” ê±°ë¦¬
+	CameraBoom->bUsePawnControlRotation = true; // ì»¨íŠ¸ë¡¤ëŸ¬ ê¸°ë°˜ìœ¼ë¡œ ì•”íšŒì „
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Ä«¸Ş¶óºÕ ³¡¿¡ Ä«¸Ş¶ó ºÎÂø
-	FollowCamera->bUsePawnControlRotation = false; // Ä«¸Ş¶ó´Â ¾Ï¿¡ ´ëÇØ »ó´ëÈ¸Àü ²û
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // ì¹´ë©”ë¼ë¶ ëì— ì¹´ë©”ë¼ ë¶€ì°©
+	FollowCamera->bUsePawnControlRotation = false; // ì¹´ë©”ë¼ëŠ” ì•”ì— ëŒ€í•´ ìƒëŒ€íšŒì „ ë”
 
-	// ÀÌ°Å±îÁö ÄÚµå·Î Â¥¾ßÇÏ³ª ½Í±âµµ ÇÏÁö¸¸ ÀÏ´Ü ¿¹Á¦´Ï °¡Á®°¨
+	// ì´ê±°ê¹Œì§€ ì½”ë“œë¡œ ì§œì•¼í•˜ë‚˜ ì‹¶ê¸°ë„ í•˜ì§€ë§Œ ì¼ë‹¨ ì˜ˆì œë‹ˆ ê°€ì ¸ê°
 	// PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -56,16 +56,16 @@ void ASimplePlayer::BeginPlay()
 	Super::BeginPlay();
 }
 
-// ¿£Áø Æ½ ¾÷µ¥ÀÌÆ® 
+// ì—”ì§„ í‹± ì—…ë°ì´íŠ¸ 
 void ASimplePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-// ÀÎÇî½º
+// ì¸í—¨ìŠ¤
 void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// ÀÎÇ² ¸ÅÇÎ ÄÁÅØ½ºÆ® 
+	// ì¸í’‹ ë§¤í•‘ ì»¨í…ìŠ¤íŠ¸ 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -74,7 +74,7 @@ void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		}
 	}
 
-	// ¾×¼Ç °¢°¢ ¹ÙÀÎµù : Á¡ÇÁ,°ø°İ,±¸¸£±â,¸¶¿ì½ºÈ¸Àü,ÀÌµ¿,
+	// ì•¡ì…˜ ê°ê° ë°”ì¸ë”© : ì í”„,ê³µê²©,êµ¬ë¥´ê¸°,ë§ˆìš°ìŠ¤íšŒì „,ì´ë™,
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ASimplePlayer::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -94,13 +94,13 @@ void ASimplePlayer::Move(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
-		// Æ÷¿öµå ¹æÇâ ·ÎÅ×ÀÌ¼Ç ¾ò°í Áö¸é±âÁØ¼öÁ÷Ãà(Z) È¸Àü(=Yaw)À» Á¦¿ÜÇÑ ¼ººĞ Á¦°Å 
+		// í¬ì›Œë“œ ë°©í–¥ ë¡œí…Œì´ì…˜ ì–»ê³  ì§€ë©´ê¸°ì¤€ìˆ˜ì§ì¶•(Z) íšŒì „(=Yaw)ì„ ì œì™¸í•œ ì„±ë¶„ ì œê±° 
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		// Áö¸é ¼öÆò ±âÁØ Æ÷¿öµå, ¶óÀÌÆ® ¹éÅÍ ¼ººĞ¿¡ 
+		// ì§€ë©´ ìˆ˜í‰ ê¸°ì¤€ í¬ì›Œë“œ, ë¼ì´íŠ¸ ë°±í„° ì„±ë¶„ì— 
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// ÀÎÇ² X Y¿¡ °¢°¢ ¸ÅÇÎ 
+		// ì¸í’‹ X Yì— ê°ê° ë§¤í•‘ 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
@@ -112,18 +112,20 @@ void ASimplePlayer::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{		
 		AddControllerYawInput(LookAxisVector.X); // X =  yaw
-		AddControllerPitchInput(LookAxisVector.Y); // Y = pitch ¿¡ ¸ÅÇÎ
+		AddControllerPitchInput(LookAxisVector.Y); // Y = pitch ì— ë§¤í•‘
 	}
 }
 
 void ASimplePlayer::Jump(const FInputActionValue& Value)
 {	
-	ACharacter::Jump(); // Ãß°¡ ±¸Çö ÇÊ¿ä ¾øÀ¸¹Ç·Î ¿£Áø³»Àå Ä³¸¯ÅÍ Á¡ÇÁ »ç¿ë
+	ACharacter::Jump(); // ì¶”ê°€ êµ¬í˜„ í•„ìš” ì—†ìœ¼ë¯€ë¡œ ì—”ì§„ë‚´ì¥ ìºë¦­í„° ì í”„ ì‚¬ìš©
 }
 
 void ASimplePlayer::Lock(const FInputActionValue& Value)
 {
-	// Ä«¸Ş¶ó °íÁ¤ ±â´É (Åä±Û)
+	// ì¹´ë©”ë¼ ê³ ì • ê¸°ëŠ¥ (í† ê¸€)
+
+	UE_LOG(LogTemplateCharacter, Display, TEXT("Lock '%s'"), *GetNameSafe(this));
 }
 
 void ASimplePlayer::Attack(const FInputActionValue& Value)
@@ -133,21 +135,21 @@ void ASimplePlayer::Attack(const FInputActionValue& Value)
 
 	PlayAnimMontage(MontageAttacks[AttackComboIndex]);
 
-	// °ø°İ ¾Ö´Ï ¸ùÅ¸ÁÖ 0 1 2 3 0 ·ÎÅ×ÀÌ¼Ç Ã³¸®
+	// ê³µê²© ì• ë‹ˆ ëª½íƒ€ì£¼ 0 1 2 3 0 ë¡œí…Œì´ì…˜ ì²˜ë¦¬
 	AttackComboIndex++;
 	if (AttackComboIndex >= AttackComboIndexMax) AttackComboIndex = 0;
 
 	UE_LOG(LogTemplateCharacter, Display, TEXT("ATK idx %d"), AttackComboIndex);
 
-	// Ä³¸¯ÅÍ ¾Õ °ø°İ ÆÇÁ¤¿ë Á¤º¸
+	// ìºë¦­í„° ì• ê³µê²© íŒì •ìš© íŒŒë¼ë¯¸í„° ì„¸íŒ…
 	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = StartLocation + GetActorForwardVector() * 200.0f; // 2¹ÌÅÍ ¾Õ
+	FVector EndLocation = StartLocation + GetActorForwardVector() * 200.0f; // 2ë¯¸í„° ì•
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
-	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // Æù¸¸ 
+	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // í°ë§Œ 
 	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(this); // ÀÚ½Å Á¦¿Ü
+	IgnoredActors.Add(this); // ìì‹  ì œì™¸
 
-	// ±¸Çü Æ®·¹ÀÌ½º ÆÇÁ¤
+	// ì ì— ëŒ€í•œ êµ¬í˜• íŠ¸ë ˆì´ìŠ¤ íŒì •
 	FHitResult OutHit;
 	bool bHasHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, OutHit, true);
 	if (bHasHit)
@@ -155,7 +157,7 @@ void ASimplePlayer::Attack(const FInputActionValue& Value)
 		auto pHitActor = OutHit.GetActor();
 		if (pHitActor != nullptr)
 		{
-			// Àû¿¡°Ô µ¥¹ÌÁö ºÎ¿©
+			// ì ì—ê²Œ ë°ë¯¸ì§€ ë¶€ì—¬
 			UGameplayStatics::ApplyDamage(pHitActor, 1, GetController(), nullptr, NULL);
 			UE_LOG(LogTemplateCharacter, Display, TEXT("HIT '%s'"), *GetNameSafe(pHitActor));
 		}		
@@ -175,7 +177,7 @@ void ASimplePlayer::Fire(const FInputActionValue& Value)
 
 void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
-	PlayAnimMontage(MontageRoll); // ¸ùÅ¸ÁÖ ÇÃ·¹ÀÌ 
+	PlayAnimMontage(MontageRoll); // ëª½íƒ€ì£¼ í”Œë ˆì´ 
 }
 
 
