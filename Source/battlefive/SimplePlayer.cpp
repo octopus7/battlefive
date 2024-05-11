@@ -157,16 +157,10 @@ void ASimplePlayer::GetClosestEnemy()
 		for(AActor *pActor : overlappedActors)
 		{
 			FHitResult hitResult;
-			FCollisionQueryParams QueryParam;
-			QueryParam.AddIgnoredActor(this);
-			FCollisionResponseParams CollRes;
 
-			//if (GetWorld()->LineTraceSingleByChannel(hitResult, Center, pActor->GetActorLocation(),
-			//	UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
-			//	false, IgnoredActors, EDrawDebugTrace::ForDuration, true))
-
-			if (GetWorld()->LineTraceSingleByChannel(hitResult, Center, pActor->GetActorLocation(),
-				ECollisionChannel::ECC_Visibility, QueryParam, CollRes) )
+			if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), Center, pActor->GetActorLocation(),
+				UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn), 
+				false, IgnoredActors, EDrawDebugTrace::ForDuration, hitResult, true))
 			{
 				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach d2 '%s'"), *GetNameSafe(pActor));
 
@@ -180,6 +174,10 @@ void ASimplePlayer::GetClosestEnemy()
 						TargetEnemy = pActor;
 					}
 				}
+			}
+			else
+			{
+				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach d2 F '%s'"), *GetNameSafe(pActor));
 			}
 		}
 	}
