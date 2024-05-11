@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -163,9 +164,14 @@ void ASimplePlayer::Attack(const FInputActionValue& Value)
 
 	if (bHasHit)
 	{
-		UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' HIT"), *GetNameSafe(this));
+		auto pHitActor = OutHit.GetActor();
+		if (pHitActor != nullptr)
+		{
+			//pHitActor->apply
+			UGameplayStatics::ApplyDamage(pHitActor, 1, GetController(), nullptr, NULL);
+			UE_LOG(LogTemplateCharacter, Display, TEXT("HIT '%s'"), *GetNameSafe(pHitActor));
+		}		
 	}
-
 }
 
 void ASimplePlayer::Fire(const FInputActionValue& Value)
