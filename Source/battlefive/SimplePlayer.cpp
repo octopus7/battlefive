@@ -83,6 +83,7 @@ void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ASimplePlayer::Attack);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASimplePlayer::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASimplePlayer::Look);
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ASimplePlayer::Roll);
 	}
 	else
 	{
@@ -128,8 +129,8 @@ void ASimplePlayer::Look(const FInputActionValue& Value)
 
 void ASimplePlayer::Jump(const FInputActionValue& Value)
 {
-	//ACharacter::Jump();
-	UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' JUMP"), *GetNameSafe(this));
+	ACharacter::Jump();
+	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' JUMP"), *GetNameSafe(this));
 }
 
 void ASimplePlayer::Lock(const FInputActionValue& Value)
@@ -139,7 +140,13 @@ void ASimplePlayer::Lock(const FInputActionValue& Value)
 
 void ASimplePlayer::Attack(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ATTACK"), *GetNameSafe(this));
+	if (MontageAttacks.IsEmpty()) return;
+	if(MontageAttacks[AttackComboIndex] == nullptr) return;
+
+	PlayAnimMontage(MontageAttacks[AttackComboIndex]);
+	AttackComboIndex++;
+	if (AttackComboIndex >= AttackComboIndexMax) AttackComboIndex = 0;
+	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ATTACK"), *GetNameSafe(this));
 }
 
 void ASimplePlayer::Fire(const FInputActionValue& Value)
@@ -149,6 +156,7 @@ void ASimplePlayer::Fire(const FInputActionValue& Value)
 
 void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
-
+	PlayAnimMontage(MontageRoll);
+	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ROLL"), *GetNameSafe(this));
 }
 

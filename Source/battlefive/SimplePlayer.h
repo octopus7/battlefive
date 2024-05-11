@@ -51,7 +51,17 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RollAction;
 
-	
+	// 애니메이션 리소스
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* MontageRoll;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	TArray<UAnimMontage*> MontageAttacks;
+
+	// 애니메이션 상태
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	int32 AttackComboIndex = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	int32 AttackComboIndexMax = 4;
 
 public:
 	// Sets default values for this character's properties
