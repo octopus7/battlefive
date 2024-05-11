@@ -11,6 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -59,6 +60,21 @@ void ASimplePlayer::BeginPlay()
 void ASimplePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (LockCamera)
+	{
+		// 카메라가 튀지 않게 부드럽게 보간 
+		FRotator currentRot = GetControlRotation();
+		FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetEnemy->GetActorLocation());
+		FRotator targetRot = FRotator(0, lookAtRot.Yaw, 0);
+		UKismetMathLibrary::RInterpTo(currentRot, targetRot, DeltaTime, 6.0f);
+
+		APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
+		if (OurPlayerController)
+		{
+			OurPlayerController->SetControlRotation(FRotator(targetRot.Pitch, targetRot.Yaw, currentRot.Roll));
+		}
+	}
 }
 
 // 인헨스
@@ -133,7 +149,7 @@ void ASimplePlayer::Lock(const FInputActionValue& Value)
 		{
 			// 있으면 락 처리
 			UE_LOG(LogTemplateCharacter, Display, TEXT("Target '%s'"), *GetNameSafe(TargetEnemy));
-			LockCamera = true;
+			LockCamera = true;			
 		}
 	}
 	else
@@ -143,6 +159,9 @@ void ASimplePlayer::Lock(const FInputActionValue& Value)
 		TargetEnemy = nullptr;
 		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock"));
 	}
+
+	bUseControllerRotationYaw = LockCamera;
+	GetCharacterMovement()->bOrientRotationToMovement = !LockCamera;
 }
 
 void ASimplePlayer::GetClosestEnemy()
