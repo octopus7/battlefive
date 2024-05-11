@@ -64,12 +64,15 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	int32 AttackComboIndexMax = 4;
 
 public:
-	// Sets default values for this character's properties
 	ASimplePlayer();
+
+	// reset attack montage index
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AttackSystem")
+	void ResetAttack();
 
 protected:
 
-	// ¿Œ«≤
+	// input methods
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);

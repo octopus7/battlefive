@@ -19,17 +19,15 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 // 생성자
 ASimplePlayer::ASimplePlayer()
-{
-	// 컴포넌트 생성 초기화	
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+{	
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f); // 컬라이더용 컴포넌트 생성
 
-	// 설정
+	// 캐릭터 컨트롤러 설정
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
 	GetCharacterMovement()->bOrientRotationToMovement = true; // 인풋 방향으로 이동
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); 
 
 	// 무브먼트 컴포넌트는 자주 변경하면서 세팅는 특성상 블루 프린트 제어 더 효율적이므로 코드 수정보다는 에디터에서 조정
 	GetCharacterMovement()->JumpZVelocity = 700.f;
@@ -52,24 +50,22 @@ ASimplePlayer::ASimplePlayer()
 	// PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
+
 void ASimplePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-// Called every frame
+// 엔진 틱 업데이트 
 void ASimplePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
-// Called to bind functionality to input
+// 인헨스
 void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// Add Input Mapping Context
+	// 인풋 매핑 컨텍스트 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -78,7 +74,7 @@ void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		}
 	}
 
-	// Set up action bindings
+	// 액션 각각 바인딩 : 점프,공격,구르기,마우스회전,이동,
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ASimplePlayer::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -95,22 +91,16 @@ void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ASimplePlayer::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
 	if (Controller != nullptr)
 	{
-		// find out which way is forward
+		// 포워드 방향 로테이션 얻고 지면기준수직축(Z) 회전(=Yaw)을 제외한 성분 제거 
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
+		// 지면 수평 기준 포워드, 라이트 백터 성분에 
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
+		// 인풋 X Y에 각각 매핑 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
@@ -118,60 +108,64 @@ void ASimplePlayer::Move(const FInputActionValue& Value)
 
 void ASimplePlayer::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
 	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+	{		
+		AddControllerYawInput(LookAxisVector.X); // X =  yaw
+		AddControllerPitchInput(LookAxisVector.Y); // Y = pitch 에 매핑
 	}
 }
 
 void ASimplePlayer::Jump(const FInputActionValue& Value)
-{
-	ACharacter::Jump();
-	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' JUMP"), *GetNameSafe(this));
+{	
+	ACharacter::Jump(); // 추가 구현 필요 없으므로 엔진내장 캐릭터 점프 사용
 }
 
 void ASimplePlayer::Lock(const FInputActionValue& Value)
 {
-
+	// 카메라 고정 기능 (토글)
 }
 
 void ASimplePlayer::Attack(const FInputActionValue& Value)
 {
-	if (MontageAttacks.IsEmpty()) return;
+	if(MontageAttacks.IsEmpty()) return;
 	if(MontageAttacks[AttackComboIndex] == nullptr) return;
 
 	PlayAnimMontage(MontageAttacks[AttackComboIndex]);
+
+	// 공격 애니 몽타주 0 1 2 3 0 로테이션 처리
 	AttackComboIndex++;
 	if (AttackComboIndex >= AttackComboIndexMax) AttackComboIndex = 0;
-	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ATTACK"), *GetNameSafe(this));
 
+	UE_LOG(LogTemplateCharacter, Display, TEXT("ATK idx %d"), AttackComboIndex);
+
+	// 캐릭터 앞 공격 판정용 정보
 	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = StartLocation + GetActorForwardVector() * 200.0f;
-
+	FVector EndLocation = StartLocation + GetActorForwardVector() * 200.0f; // 2미터 앞
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
-	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
+	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // 폰만 
 	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(this);
+	IgnoredActors.Add(this); // 자신 제외
 
+	// 구형 트레이스 판정
 	FHitResult OutHit;
 	bool bHasHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, OutHit, true);
-
 	if (bHasHit)
 	{
 		auto pHitActor = OutHit.GetActor();
 		if (pHitActor != nullptr)
 		{
-			//pHitActor->apply
+			// 적에게 데미지 부여
 			UGameplayStatics::ApplyDamage(pHitActor, 1, GetController(), nullptr, NULL);
 			UE_LOG(LogTemplateCharacter, Display, TEXT("HIT '%s'"), *GetNameSafe(pHitActor));
 		}		
 	}
+}
+
+void ASimplePlayer::ResetAttack_Implementation()
+{
+	UE_LOG(LogTemplateCharacter, Display, TEXT("ATK idx 0"));
+	AttackComboIndex = 0;
 }
 
 void ASimplePlayer::Fire(const FInputActionValue& Value)
@@ -181,7 +175,8 @@ void ASimplePlayer::Fire(const FInputActionValue& Value)
 
 void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
-	PlayAnimMontage(MontageRoll);
-	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ROLL"), *GetNameSafe(this));
+	PlayAnimMontage(MontageRoll); // 몽타주 플레이 
 }
+
+
 
