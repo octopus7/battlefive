@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -147,6 +148,23 @@ void ASimplePlayer::Attack(const FInputActionValue& Value)
 	AttackComboIndex++;
 	if (AttackComboIndex >= AttackComboIndexMax) AttackComboIndex = 0;
 	//UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' ATTACK"), *GetNameSafe(this));
+
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = StartLocation + GetActorForwardVector() * 200.0f;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
+	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+
+	TArray<AActor*> IgnoredActors;
+
+	FHitResult OutHit;
+	bool bHasHit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, OutHit, true);
+
+	if (bHasHit)
+	{
+		UE_LOG(LogTemplateCharacter, Display, TEXT("'%s' HIT"), *GetNameSafe(this));
+	}
+
 }
 
 void ASimplePlayer::Fire(const FInputActionValue& Value)
