@@ -46,8 +46,7 @@ ASimplePlayer::ASimplePlayer()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // 카메라붐 끝에 카메라 부착
 	FollowCamera->bUsePawnControlRotation = false; // 카메라는 암에 대해 상대회전 끔
 
-	// 이거까지 코드로 짜야하나 싶기도 하지만 일단 예제니 가져감
-	// PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 
@@ -125,17 +124,24 @@ void ASimplePlayer::Jump(const FInputActionValue& Value)
 void ASimplePlayer::Lock(const FInputActionValue& Value)
 {
 	// 카메라 고정 기능 (토글)
-	LockCamera = !LockCamera;
-	if (LockCamera)
-	{
-		GetClosestEnemy();
-		UE_LOG(LogTemplateCharacter, Display, TEXT("Lock '%s'"), *GetNameSafe(this));
-		if(TargetEnemy != nullptr) UE_LOG(LogTemplateCharacter, Display, TEXT("Target '%s'"), *GetNameSafe(TargetEnemy));
+	// 	
+	if (!LockCamera)
+	{		
+		GetClosestEnemy(); // 최인접 적 찾아서
+		UE_LOG(LogTemplateCharacter, Display, TEXT("Lock"));
+		if (TargetEnemy != nullptr)
+		{
+			// 있으면 락 처리
+			UE_LOG(LogTemplateCharacter, Display, TEXT("Target '%s'"), *GetNameSafe(TargetEnemy));
+			LockCamera = true;
+		}
 	}
 	else
 	{
+		// 이미 락 중이면 락해제 
+		LockCamera = false;
 		TargetEnemy = nullptr;
-		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock '%s'"), *GetNameSafe(this));
+		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock"));
 	}
 }
 
@@ -174,10 +180,6 @@ void ASimplePlayer::GetClosestEnemy()
 						TargetEnemy = pActor;
 					}
 				}
-			}
-			else
-			{
-				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach d2 F '%s'"), *GetNameSafe(pActor));
 			}
 		}
 	}
