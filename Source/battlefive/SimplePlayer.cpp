@@ -23,14 +23,14 @@ ASimplePlayer::ASimplePlayer()
 {	
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f); // 컬라이더용 컴포넌트 생성
 
-	// 캐릭터 컨트롤러 설정
+	// 캐릭터 컨트롤러 기본값 설정
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true; // 인풋 방향으로 이동
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); 
 
-	// 무브먼트 컴포넌트는 자주 변경하면서 세팅는 특성상 블루 프린트 제어 더 효율적이므로 코드 수정보다는 에디터에서 조정
+	// 무브먼트 컴포넌트는 자주 변경하면서 세팅되는 특성상 블루프린트 제어가 더 효율적이므로 코드 수정보다는 에디터에서 조정
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -56,7 +56,7 @@ void ASimplePlayer::BeginPlay()
 	Super::BeginPlay();
 }
 
-// 엔진 틱 업데이트 
+// 엔진 틱 업데이트 (카메라 락 보정 용도로만 사용중)
 void ASimplePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -64,9 +64,10 @@ void ASimplePlayer::Tick(float DeltaTime)
 	if (LockCamera)
 	{
 		// 락된 대상이 사라진경우 락해제
-		if (TargetEnemy == nullptr)
+		if (!IsValid(TargetEnemy))
 		{
 			LockCamera = false;
+			TargetEnemy = nullptr;
 		}
 		else
 		{
@@ -141,6 +142,8 @@ void ASimplePlayer::Move(const FInputActionValue& Value)
 	}
 }
 
+
+// 마우스 입력에 대한 카메라 조작 매핑
 void ASimplePlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -153,7 +156,7 @@ void ASimplePlayer::Look(const FInputActionValue& Value)
 
 void ASimplePlayer::Jump(const FInputActionValue& Value)
 {	
-	ACharacter::Jump(); // 추가 구현 필요 없으므로 엔진내장 캐릭터 점프 사용
+	ACharacter::Jump(); // 추가구현이 필요 없으므로 엔진내장 캐릭터 점프 그대로 사용
 }
 
 void ASimplePlayer::Lock(const FInputActionValue& Value)
@@ -179,7 +182,7 @@ void ASimplePlayer::Lock(const FInputActionValue& Value)
 		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock"));
 	}
 
-	//bUseControllerRotationYaw = LockCamera;
+	bUseControllerRotationYaw = LockCamera;
 	GetCharacterMovement()->bOrientRotationToMovement = !LockCamera;
 }
 
@@ -228,6 +231,13 @@ void ASimplePlayer::Attack(const FInputActionValue& Value)
 	if(MontageAttacks.IsEmpty()) return;
 	if(MontageAttacks[AttackComboIndex] == nullptr) return;
 
+	if (AttackComboIndex > 0 && !AvailNextAttack)
+	{
+		// 콤보 진행중인경우 콤보 가능지점에 도달하지 않으면 입력 무시
+		return;
+	}
+
+	AvailNextAttack = false;
 	PlayAnimMontage(MontageAttacks[AttackComboIndex]);
 
 	// 공격 애니 몽타주 0 1 2 3 0 로테이션 처리
@@ -263,16 +273,23 @@ void ASimplePlayer::ResetAttack_Implementation()
 {
 	UE_LOG(LogTemplateCharacter, Display, TEXT("ATK idx 0"));
 	AttackComboIndex = 0;
+	AvailNextAttack = false;
+	// 공격 애니메이션 몽타주에 심어진 모션이 끝나는 지점을 통과한경우
+	// 콤보 인덱스 리셋후 다시 처음부터 진행
+}
+
+void ASimplePlayer::AllowNextAttack_Implementation()
+{
+	UE_LOG(LogTemplateCharacter, Display, TEXT("Allow Next ATK idx %d"), AttackComboIndex);
+	AvailNextAttack = true;	
 }
 
 void ASimplePlayer::Fire(const FInputActionValue& Value)
 {
-
+	// not implemented
 }
 
 void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
 	PlayAnimMontage(MontageRoll); // 몽타주 플레이 
 }
-
-

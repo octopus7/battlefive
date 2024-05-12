@@ -63,6 +63,9 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	int32 AttackComboIndexMax = 4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	bool AvailNextAttack = false;
+
 	// 카메라 락 상태
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	bool LockCamera;
@@ -85,6 +88,10 @@ public:
 	// reset attack montage index 공격 로테이션 몽타주 인덱스 리셋 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AttackSystem")
 	void ResetAttack();
+
+	// allow next attack
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AttackSystem")
+	void AllowNextAttack();
 
 protected:
 
