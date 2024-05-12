@@ -63,10 +63,19 @@ class BATTLEFIVE_API ASimplePlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	int32 AttackComboIndexMax = 4;
 
-	// 카메라 록 상태
+	// 카메라 락 상태
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	bool LockCamera;
 
+	// 카메라 락 전환 속도 (클수록 빠름)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float LockSpeed = 3.0f;
+
+	// 카메라 락 제한거리
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float LockMaxDistance = 2000.0f;
+
+	// 락된 대상
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	AActor* TargetEnemy;
 
@@ -91,7 +100,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// 카메라 락 대상 찾기
+	// 카메라 락할 대상 찾기 (최인접)
 	void GetClosestEnemy();
 
 public:	

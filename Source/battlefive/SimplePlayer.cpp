@@ -63,16 +63,35 @@ void ASimplePlayer::Tick(float DeltaTime)
 
 	if (LockCamera)
 	{
-		// 카메라가 튀지 않게 부드럽게 보간 
-		FRotator currentRot = GetControlRotation();
-		FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetEnemy->GetActorLocation());
-		FRotator targetRot = FRotator(0, lookAtRot.Yaw, 0);
-		UKismetMathLibrary::RInterpTo(currentRot, targetRot, DeltaTime, 6.0f);
+		// 락된 대상이 사라진경우 락해제
+		if (TargetEnemy == nullptr)
+		{
+			LockCamera = false;
+		}
+		else
+		{
+			// 거리가 멀어진경우도 해제
+			float fDistance = GetDistanceTo(TargetEnemy);
+			if (LockMaxDistance < fDistance)
+			{
+				LockCamera = false;
+				TargetEnemy = nullptr;
+			}
+		}
+	}
 
+	if (LockCamera)
+	{
+		FRotator currentRot = GetControlRotation(); //원래 회전
+		FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetEnemy->GetActorLocation()); // 락 된 대상 룩앳
+		FRotator targetRot = FRotator(currentRot.Pitch, lookAtRot.Yaw, currentRot.Roll); // 최종 로테이션은 Yaw만 반영
+
+		// 카메라가 튀지 않게 부드럽게 보간처리 전환 스피드는 블루 프린트에서 받아옴
+		FRotator targetRotSmooth = UKismetMathLibrary::RInterpTo(currentRot, targetRot, DeltaTime, LockSpeed);
 		APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
 		if (OurPlayerController)
 		{
-			OurPlayerController->SetControlRotation(FRotator(targetRot.Pitch, targetRot.Yaw, currentRot.Roll));
+			OurPlayerController->SetControlRotation(targetRotSmooth);
 		}
 	}
 }
@@ -160,7 +179,7 @@ void ASimplePlayer::Lock(const FInputActionValue& Value)
 		UE_LOG(LogTemplateCharacter, Display, TEXT("Unlock"));
 	}
 
-	bUseControllerRotationYaw = LockCamera;
+	//bUseControllerRotationYaw = LockCamera;
 	GetCharacterMovement()->bOrientRotationToMovement = !LockCamera;
 }
 
@@ -187,7 +206,7 @@ void ASimplePlayer::GetClosestEnemy()
 				UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn), 
 				false, IgnoredActors, EDrawDebugTrace::ForDuration, hitResult, true))
 			{
-				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach d2 '%s'"), *GetNameSafe(pActor));
+				UE_LOG(LogTemplateCharacter, Display, TEXT("foreach linetrace '%s'"), *GetNameSafe(pActor));
 
 				auto pHitActor = hitResult.GetActor();
 				if (pHitActor == pActor)
