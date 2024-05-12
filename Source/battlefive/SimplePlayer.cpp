@@ -157,6 +157,8 @@ void ASimplePlayer::Look(const FInputActionValue& Value)
 void ASimplePlayer::Jump(const FInputActionValue& Value)
 {	
 	ACharacter::Jump(); // 추가구현이 필요 없으므로 엔진내장 캐릭터 점프 그대로 사용
+	AttackComboIndex = 0;
+	AvailNextAttack = false;
 }
 
 void ASimplePlayer::Lock(const FInputActionValue& Value)
@@ -292,4 +294,6 @@ void ASimplePlayer::Fire(const FInputActionValue& Value)
 void ASimplePlayer::Roll(const FInputActionValue& Value)
 {
 	PlayAnimMontage(MontageRoll); // 몽타주 플레이 
+	AttackComboIndex = 0;
+	AvailNextAttack = false;
 }
