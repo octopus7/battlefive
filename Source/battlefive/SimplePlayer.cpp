@@ -97,7 +97,7 @@ void ASimplePlayer::Tick(float DeltaTime)
 	}
 }
 
-// 인헨스
+// 인헨스드 인풋 연결 (UE5.2부터 적용)
 void ASimplePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// 인풋 매핑 컨텍스트 
